@@ -1,0 +1,10 @@
+LICENSE
+README.md
+pyproject.toml
+setup.py
+whale/__init__.py
+whale/whale.py
+whale.egg-info/PKG-INFO
+whale.egg-info/SOURCES.txt
+whale.egg-info/dependency_links.txt
+whale.egg-info/top_level.txt
