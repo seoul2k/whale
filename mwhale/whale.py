@@ -36,7 +36,7 @@ class Whale:
         self.w = False
         self.s.close()
 
-    def run(self, req, listen=5, host=socket.gethostname(), port=8080, error=False):
+    def run(self, req=None, listen=5, host=socket.gethostname(), port=8080, error=False):
         while True:
             try:
                 self.s.bind((host, port))
@@ -45,6 +45,48 @@ class Whale:
                 port += 1
         print('host:'+str(host)+'\nport:' +
               str(port)+'\n', str(host)+':'+str(port))
+        if req == None:
+            while self.w:
+                try:
+                    self.s.listen(listen)
+                    conn, addr = self.s.accept()
+                    print('\033[92m'+conn.recv(1024).decode('utf-8')+'\033[0m')
+                    conn.send(b'Http/1.1 200 ok\r\n\r\n')
+                    conn.send(self.getTemplate(
+                        './template/homepage/index.html').encode('utf-8'))
+                    conn.close()
+                except Exception:
+                    while 1:
+                        e = traceback.format_exc().split('\n')
+                        e1 = ''
+                        for x in e:
+                            e1 += '<p>'+x+'</p>'
+                        print(e1)
+                        error = '''
+        <!DOCTYPE html>
+        <html lang="en">
+
+        <head>
+            <meta charset="UTF-8">
+            <meta http-equiv="X-UA-Compatible" content="IE=edge">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>error</title>
+        </head>
+
+        <body>
+            {}
+        </body>
+
+        </html>
+        '''.format(e1)
+                        self.s.listen(listen)
+                        conn, addr = self.s.accept()
+                        print('\033[92m' +
+                              conn.recv(1024).decode('utf-8')+'\033[0m')
+                        conn.send(b'Http/1.1 200 ok\r\n\r\n')
+                        conn.send(error.encode('utf-8'))
+                        conn.close()
+
         if error:
             while 1:
                 e = traceback.format_exc().split('\n')
@@ -113,3 +155,6 @@ class Whale:
                     conn.send(b'Http/1.1 200 ok\r\n\r\n')
                     conn.send(error.encode('utf-8'))
                     conn.close()
+
+
+Whale().run()
